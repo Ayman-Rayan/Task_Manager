@@ -1,0 +1,104 @@
+<?php
+include('config/constants.php');
+// get the list valiue from url
+$list_id_url=$_GET['list_id'];
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="<?php echo SITEURL; ?>style/style.css"/>
+    <title>task manager with php and mysql</title>
+</head>
+<body>
+    <div class="wrapper">
+    <h1>Task Manager</h1>
+
+     <!-- Menu -->
+     <div class="menu">
+
+<a href="<?php echo SITEURL; ?>">Home </a>
+<?php
+ // displaying lists in menu
+ $conn2=mysqli_connect(LOCALHOST,DB_USERNAME,DB_PASSWORD) or die(mysqli_error());
+ $db_select2=mysqli_select_db($conn2,DB_NAME) or die(mysqli_error());
+ $sql2="SELECT * from tbl_lists";
+ $res2=mysqli_query($conn2,$sql2);
+
+ if ($res2==true) {
+     //display 
+     while ($row2=mysqli_fetch_assoc($res2)) {
+         $list_id=$row2['list_id'];
+         $list_name=$row2['list_name'];
+?>
+<a href="<?php echo SITEURL;?>list-task.php?list_id=<?php echo $list_id; ?>"><?php echo $list_name ?></a>
+
+<?php
+     }
+ }
+
+?>
+
+
+<a href="<?php echo SITEURL; ?>manage-list.php">Manage Lists</a>
+</div>
+
+<div class="all-task">
+    <a class="btn-primary" href="<?php echo SITEURL; ?>add-task.php">add task</a>
+    <table class="tbl-full">
+        <tr>
+            <th>S.N</th>
+            <th>TASK NAme</th>
+            <th>priority</th>
+            <th>deadline</th>
+            <th>actions</th>
+        </tr>
+        <?php
+           $conn=mysqli_connect(LOCALHOST,DB_USERNAME,DB_PASSWORD) or die(mysqli_error());
+           $db_select=mysqli_select_db($conn,DB_NAME) or die(mysqli_error());
+           $sql="SELECT * from tbl_tasks where list_id=$list_id_url";
+           $res=mysqli_query($conn,$sql);
+           if ($res==true) {
+               $count_rows=mysqli_num_rows($res);
+               if ($count_rows>0) {
+                   while ($row=mysqli_fetch_assoc($res)) {
+                       $task_id=$row['task_id'];
+                       $task_name=$row['task_name'];
+                       $priority=$row['priority'];
+                       $deadline=$row['deadline'];
+
+                       ?>
+ <tr>
+            <td>1.</td>
+            <td><?php echo $task_name; ?></td>
+            <td><?php echo $priority; ?></td>
+            <td><?php echo $deadline; ?></td>
+            <td>
+            <a href="<?php echo SITEURL; ?>update-task.php?task_id=<?php echo $task_id ; ?>">Update</a>
+                    <a href="<?php echo SITEURL; ?>delete-task.php?task_id=<?php echo $task_id; ?>">Delete</a>
+            </td>
+        </tr>
+
+                       <?php
+                   }
+               }
+               else{
+
+                ?>
+                <tr>
+                    <td colspan="5">No tasks added on this list </td>
+                </tr>
+                <?php
+               }
+           }
+        ?>
+       
+    </table>
+</div>
+
+
+</div>
+</body>
+</html>
